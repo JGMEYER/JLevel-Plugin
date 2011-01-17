@@ -6,13 +6,18 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
-// TODO: Convert everything to SQLite
-
+/**
+ * Handle calls to flatfiles
+ * @author JMEYER
+ */
 public class FileManager {
+	
+	// OLD METHODS
 	
 	public static void createRootDirectoryIfNotExists() {
 		File playerDirectory = new File("JLevel Files");
