@@ -10,6 +10,8 @@ import java.util.Scanner;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
+// TODO: Convert everything to SQLite
+
 public class FileManager {
 	
 	public static void createRootDirectoryIfNotExists() {
