@@ -1,0 +1,3 @@
+name: JLevel
+main: com.jmeyer.bukkit.jlevel.JLevelPlugin
+version: 0.1
