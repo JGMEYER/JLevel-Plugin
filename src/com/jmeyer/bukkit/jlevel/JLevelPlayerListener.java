@@ -24,12 +24,14 @@ public class JLevelPlayerListener extends PlayerListener {
     @Override
     public void onPlayerJoin(PlayerEvent event) {
     	FileManager.createPlayerDatasheetIfNotExists(event.getPlayer());
+    	DatabaseManager.createPlayerTableIfNotExists(event.getPlayer());
     }
 
     @Override
     public void onPlayerQuit(PlayerEvent event) {
     }
 
+    // TODO: implement with SQLite queries
     @Override
     public void onPlayerCommand(PlayerChatEvent event) {
         String[] split = event.getMessage().split(" ");

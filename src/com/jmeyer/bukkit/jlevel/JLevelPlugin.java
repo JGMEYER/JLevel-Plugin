@@ -32,10 +32,13 @@ public class JLevelPlugin extends JavaPlugin {
     }
 
     public void onEnable() {
+    	// TODO: Eliminate need for these - move to DatabaseManager
     	// Create JLevel directories
     	FileManager.createRootDirectoryIfNotExists();
     	FileManager.createMainPlayerDirectoryIfNotExists();
     	FileManager.createMainSkillDirectoryIfNotExists();
+    	
+    	DatabaseManager.createRootDirectoryIfNotExists();
     	
     	// Create default skills if not already added
     	String[] miningItemRules = {"270:0","274:5","285:10","257:25","278:40"};
