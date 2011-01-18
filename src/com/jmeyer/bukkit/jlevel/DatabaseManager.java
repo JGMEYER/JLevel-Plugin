@@ -23,8 +23,9 @@ import org.bukkit.entity.Player;
 public class DatabaseManager {
 	
 	public static final Logger LOG = Logger.getLogger("Minecraft");
-	public static final String PLAYER_DATABASE = "jdbc:sqlite:JLevel-Data" + File.separator + "Players.db";
-	public static final String SKILL_DATABASE = "jdbc:sqlite:JLevel-Data" + File.separator + "Skills.db";
+	public static final String ROOT_DIRECTORY = "JLevel-Data";
+	public static final String PLAYER_DB_DIRECTORY = "jdbc:sqlite:" + ROOT_DIRECTORY + File.separator;
+	public static final String SKILL_DB_DIRECTORY = "jdbc:sqlite:" + ROOT_DIRECTORY + File.separator;
 	
 	// TODO: remove this. doesn't allow for name change.
 	/*
@@ -40,7 +41,7 @@ public class DatabaseManager {
 			Statement st = null;
 			try {
 				Class.forName("org.sqlite.JDBC");
-				conn = DriverManager.getConnection(PLAYER_DATABASE);
+				conn = DriverManager.getConnection(playerDatabasePath(player));
 				st = conn.createStatement();
 				
 				String update = "CREATE TABLE `" + player.getName() + "` (" +
@@ -82,7 +83,7 @@ public class DatabaseManager {
 		ResultSet rs = null;
 		try {
 			Class.forName("org.sqlite.JDBC");
-			conn = DriverManager.getConnection(PLAYER_DATABASE);
+			conn = DriverManager.getConnection(playerDatabasePath(player));
 			DatabaseMetaData dbm = conn.getMetaData();
 			rs = dbm.getTables(null, null, player.getName(), null);
 			if (!rs.next())
@@ -104,6 +105,14 @@ public class DatabaseManager {
 				LOG.log(Level.SEVERE, "[JLEVEL]: Table Check SQL Exception (on closing)");
 			}
 		}
+	}
+	
+	private static String playerDatabasePath(Player player) {
+		return PLAYER_DB_DIRECTORY + player.getName() + ".db";
+	}
+	
+	private static String skillDatabasePath(String skill) {
+		return SKILL_DB_DIRECTORY + skill + ".db";
 	}
 	
 }
