@@ -80,11 +80,21 @@ public class DatabaseManager {
 	
 	
 	
-	public static void createRootDirectoryIfNotExists() {
-		File playerDirectory = new File("JLevel-Data");
+	public static void createDirectoriesIfNotExists() {
+		File rootDirectory = new File("JLevel-Data");
+		File playerDirectory = new File("JLevel-Data/Players");
+		File skillDirectory = new File("JLevel-Data/Skills");
+		
+		if (!rootDirectory.exists()) {
+			rootDirectory.mkdir();
+		}
 		
 		if (!playerDirectory.exists()) {
 			playerDirectory.mkdir();
+		}
+		
+		if (!skillDirectory.exists()) {
+			skillDirectory.mkdir();
 		}
 	}
 	

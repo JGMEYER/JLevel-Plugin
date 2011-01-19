@@ -38,7 +38,7 @@ public class JLevelPlugin extends JavaPlugin {
     	FileManager.createMainPlayerDirectoryIfNotExists();
     	FileManager.createMainSkillDirectoryIfNotExists();
     	
-    	DatabaseManager.createRootDirectoryIfNotExists();
+    	DatabaseManager.createDirectoriesIfNotExists();
     	
     	// Create default skills if not already added
     	String[] miningItemRules = {"270:0","274:5","285:10","257:25","278:40"};
