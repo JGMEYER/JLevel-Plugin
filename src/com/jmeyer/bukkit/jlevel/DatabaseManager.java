@@ -98,7 +98,7 @@ public class DatabaseManager {
 				st = conn.createStatement();
 				
 				String update = "CREATE TABLE `" + player.getName() + "` (" +
-					"`id` INTEGER PRIMARY KEY AUTO_INCREMENT," +
+					"`id` INTEGER PRIMARY KEY," +
 					"`skillName` varchar(32)," +
 					"`skillLevel` INTEGER," +
 					"`levelExp` INTEGER," +
@@ -133,7 +133,7 @@ public class DatabaseManager {
 			
 			if (!itemRulesTableExistsForSkill(skill)) {
 				String itemRulesUpdate = "CREATE TABLE `itemRules` (" +
-					"`id` INTEGER PRIMARY KEY AUTO_INCREMENT," +
+					"`id` INTEGER PRIMARY KEY," +
 					"`itemId` INTEGER," +
 					"`exp` INTEGER" + ");";
 				st.executeUpdate(itemRulesUpdate);
@@ -141,7 +141,7 @@ public class DatabaseManager {
 			
 			if (!expRulesTableExistsForSkill(skill)) {
 				String expRulesUpdate = "CREATE TABLE `expRules` (" +
-					"`id` INTEGER PRIMARY KEY AUTO_INCREMENT," +
+					"`id` INTEGER PRIMARY KEY," +
 					"`action` varchar(32)," +
 					"`receiver` varchar(32)," + 
 					"`receiverState` varchar(32)," +
@@ -151,7 +151,7 @@ public class DatabaseManager {
 			
 			if (!expLevelsTableExistsForSkill(skill)) {
 				String expLevelsUpdate = "CREATE TABLE `expLevels` (" +
-					"`id` INTEGER PRIMARY KEY AUTO_INCREMENT," +
+					"`id` INTEGER PRIMARY KEY," +
 					"`level` INTEGER," +
 					"`expNeeded` INTEGER" + ");";
 				st.executeUpdate(expLevelsUpdate);
