@@ -38,11 +38,42 @@ public class DatabaseManager {
 	// TODO: make ignore null fields
 	// TODO: implement clearCurrent, which removes original tables if true
 	// TODO: implement clearCurrent with createSkillDatabaseIfNotExists
-	public static void formatSkill(String skill, String[] itemRules, String[] expRules, String[] expTable, boolean clearCurrent) {
+	// Updates, or creates skill if not already created
+	public static void updateSkill(String skill, String[] itemRules, String[] expRules, String[] expTable, boolean clearCurrent) {
 		createSkillDatabaseIfNotExists(skill);
 		
 		// TODO: remove test values and actually parse
+		Connection conn = null;
+		Statement st = null;
+		try {
+			Class.forName("org.sqlite.JDBC");
+			conn = DriverManager.getConnection(skillDatabasePath(skill));
+			st = conn.createStatement();
+			
+			// TODO: make addrow() and addItemRulesRow(Skill, _, _);
+			String itemRulesUpdate = "INSERT INTO " + skill + ".`itemRules` (`itemId`,`exp`) VALUES(0,1);";
+			st.executeUpdate(itemRulesUpdate);
+
+			String expRulesUpdate = "INSERT INTO " + skill + ".`expRules` (`action`,`receiver`,`receiverState`,`exp`) VALUES('blockbreak', '1', '0', 3);";
+			st.executeUpdate(expRulesUpdate);
 		
+			String expLevelsUpdate = "INSERT INTO " + skill + ".`expLevels` (`level`, `expNeeded`) VALUES(1, 83);";
+			st.executeUpdate(expLevelsUpdate);
+
+		} catch (SQLException e) {
+			LOG.log(Level.SEVERE, "[JLEVEL]: Create Table Exception", e);
+		} catch (ClassNotFoundException e) {
+			LOG.log(Level.SEVERE, "[JLEVEL]: Error loading org.sqlite.JDBC");
+		} finally {
+			try {
+				if (conn != null)
+					conn.close();
+				if (st != null)
+					st.close();
+			} catch (SQLException e) {
+				LOG.log(Level.SEVERE, "[JLEVEL]: Could not create the table (on close)");
+			}
+		}
 	}
 	
 	
@@ -114,7 +145,7 @@ public class DatabaseManager {
 					"`action` varchar(32)," +
 					"`receiver` varchar(32)," + 
 					"`receiverState` varchar(32)," +
-					"`experience` INTEGER" + ");";
+					"`exp` INTEGER" + ");";
 				st.executeUpdate(expRulesUpdate);
 			}
 			
