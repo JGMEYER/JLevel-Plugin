@@ -50,14 +50,14 @@ public class DatabaseManager {
 			conn = DriverManager.getConnection(skillDatabasePath(skill));
 			st = conn.createStatement();
 			
-			// TODO: make addrow() and addItemRulesRow(Skill, _, _);
-			String itemRulesUpdate = "INSERT INTO " + skill + ".`itemRules` (`itemId`,`exp`) VALUES(0,1);";
+			// TODO: make addRow() and addItemRulesRow(Skill, _, _);
+			String itemRulesUpdate = "INSERT INTO `itemRules` (`itemId`,`exp`) VALUES(0,1);";
 			st.executeUpdate(itemRulesUpdate);
 
-			String expRulesUpdate = "INSERT INTO " + skill + ".`expRules` (`action`,`receiver`,`receiverState`,`exp`) VALUES('blockbreak', '1', '0', 3);";
+			String expRulesUpdate = "INSERT INTO `expRules` (`action`,`receiver`,`receiverState`,`exp`) VALUES('blockbreak', '1', '0', 3);";
 			st.executeUpdate(expRulesUpdate);
 		
-			String expLevelsUpdate = "INSERT INTO " + skill + ".`expLevels` (`level`, `expNeeded`) VALUES(1, 83);";
+			String expLevelsUpdate = "INSERT INTO `expLevels` (`level`, `expNeeded`) VALUES(1, 83);";
 			st.executeUpdate(expLevelsUpdate);
 
 		} catch (SQLException e) {
