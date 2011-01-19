@@ -24,8 +24,8 @@ public class DatabaseManager {
 	
 	public static final Logger LOG = Logger.getLogger("Minecraft");
 	public static final String ROOT_DIRECTORY = "JLevel-Data";
-	public static final String PLAYER_DB_DIRECTORY = "jdbc:sqlite:" + ROOT_DIRECTORY + File.separator;
-	public static final String SKILL_DB_DIRECTORY = "jdbc:sqlite:" + ROOT_DIRECTORY + File.separator;
+	public static final String PLAYER_DB_DIRECTORY = "jdbc:sqlite:" + ROOT_DIRECTORY + File.separator + "Players" + File.separator;
+	public static final String SKILL_DB_DIRECTORY = "jdbc:sqlite:" + ROOT_DIRECTORY + File.separator + "Skills" + File.separator;
 	
 	// TODO: remove this. doesn't allow for name change.
 	/*
