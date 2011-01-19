@@ -35,7 +35,15 @@ public class DatabaseManager {
 		+ "`permissions` varchar(150) NOT NULL DEFAULT ''," + "`welcomeMessage` varchar(100) NOT NULL DEFAULT ''" +");";
 	*/
 	
-	public static void createPlayerTableIfNotExists(Player player) {
+	public static void createRootDirectoryIfNotExists() {
+		File playerDirectory = new File("JLevel-Data");
+		
+		if (!playerDirectory.exists()) {
+			playerDirectory.mkdir();
+		}
+	}
+	
+	public static void createPlayerDatabaseIfNotExists(Player player) {
 		if (!playerTableExists(player)) {
 			Connection conn = null;
 			Statement st = null;
@@ -45,7 +53,7 @@ public class DatabaseManager {
 				st = conn.createStatement();
 				
 				String update = "CREATE TABLE `" + player.getName() + "` (" +
-					"`id` INTEGER PRIMARY KEY," +
+					"`id` INTEGER PRIMARY KEY AUTO_INCREMENT," +
 					"`skillName` varchar(32)," +
 					"`skillLevel` INTEGER," +
 					"`levelExp` INTEGER," +
@@ -70,22 +78,73 @@ public class DatabaseManager {
 		}
 	}
 	
-	public static void createRootDirectoryIfNotExists() {
-		File playerDirectory = new File("JLevel-Data");
-		
-		if (!playerDirectory.exists()) {
-			playerDirectory.mkdir();
+	/*
+	public static void createSkillDatabaseIfNotExists(String skill) { // , String[] itemRules, String[] expRules, String[] expTable) {
+		Connection conn = null;
+		Statement st = null;
+		try {
+			Class.forName("org.sqlite.JDBC");
+			conn = DriverManager.getConnection(skillDatabasePath(skill));
+			st = conn.createStatement();
+			
+			String itemRulesUpdate = "CREATE TABLE `itemRules` (" +
+				"`id` INTEGER PRIMARY KEY AUTO_INCREMENT," +
+				"`itemId` INTEGER," +
+				"`exp` INTEGER" + ");";
+			
+			String expRulesUpdate = "CREATE TABLE `expRules` (" +
+				"`id` INTEGER PRIMARY KEY AUTO_INCREMENT," +
+				"`action` varchar(32)," +
+				"`receiver` varchar(32)," + 
+				"`receiverState` varchar(32)," +
+				"`experience` INTEGER" + ");";
+			
+			String expLevelsUpdate = "CREATE TABLE `expLevels` (" +
+				"`id` INTEGER PRIMARY KEY AUTO_INCREMENT," +
+				"`level` INTEGER," +
+				"`expNeeded` INTEGER" + ");";
+			
+			st.executeUpdate(itemRulesUpdate);
+			st.executeUpdate(expRulesUpdate);
+			st.executeUpdate(expLevelsUpdate);
+		} catch (SQLException e) {
+			LOG.log(Level.SEVERE, "[JLEVEL]: Create Table Exception", e);
+		} catch (ClassNotFoundException e) {
+			LOG.log(Level.SEVERE, "[JLEVEL]: Error loading org.sqlite.JDBC");
+		} finally {
+			try {
+				if (conn != null)
+					conn.close();
+				if (st != null)
+					st.close();
+			} catch (SQLException e) {
+				LOG.log(Level.SEVERE, "[JLEVEL]: Could not create the table (on close)");
+			}
 		}
 	}
+	*/
+	
+	
+	
+	
 	
 	public static boolean playerTableExists(Player player) {
+		return tableExists(playerDatabasePath(player), player.getName());
+	}
+	
+	public static boolean itemRulesTableExistsForSkill(String skill) {
+		return tableExists(skillDatabasePath(skill), "itemRules");
+	}
+	// TODO: CONTINUE PATTERN!
+	
+	public static boolean tableExists(String connectionPath, String tableName) {
 		Connection conn = null;
 		ResultSet rs = null;
 		try {
 			Class.forName("org.sqlite.JDBC");
-			conn = DriverManager.getConnection(playerDatabasePath(player));
+			conn = DriverManager.getConnection(connectionPath);
 			DatabaseMetaData dbm = conn.getMetaData();
-			rs = dbm.getTables(null, null, player.getName(), null);
+			rs = dbm.getTables(null, null, tableName, null);
 			if (!rs.next())
 				return false;
 			return true;
@@ -106,6 +165,9 @@ public class DatabaseManager {
 			}
 		}
 	}
+	
+	
+	
 	
 	private static String playerDatabasePath(Player player) {
 		return PLAYER_DB_DIRECTORY + player.getName() + ".db";

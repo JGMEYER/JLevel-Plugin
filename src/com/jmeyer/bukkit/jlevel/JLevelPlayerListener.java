@@ -24,7 +24,7 @@ public class JLevelPlayerListener extends PlayerListener {
     @Override
     public void onPlayerJoin(PlayerEvent event) {
     	FileManager.createPlayerDatasheetIfNotExists(event.getPlayer());
-    	DatabaseManager.createPlayerTableIfNotExists(event.getPlayer());
+    	DatabaseManager.createPlayerDatabaseIfNotExists(event.getPlayer());
     }
 
     @Override
