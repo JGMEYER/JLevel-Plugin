@@ -35,6 +35,20 @@ public class DatabaseManager {
 		+ "`permissions` varchar(150) NOT NULL DEFAULT ''," + "`welcomeMessage` varchar(100) NOT NULL DEFAULT ''" +");";
 	*/
 	
+	// TODO: make ignore null fields
+	// TODO: implement clearCurrent, which removes original tables if true
+	// TODO: implement clearCurrent with createSkillDatabaseIfNotExists
+	public static void formatSkill(String skill, String[] itemRules, String[] expRules, String[] expTable, boolean clearCurrent) {
+		createSkillDatabaseIfNotExists(skill);
+		
+		// TODO: remove test values and actually parse
+		
+	}
+	
+	
+	
+	
+	
 	public static void createRootDirectoryIfNotExists() {
 		File playerDirectory = new File("JLevel-Data");
 		
@@ -78,7 +92,6 @@ public class DatabaseManager {
 		}
 	}
 	
-	/*
 	public static void createSkillDatabaseIfNotExists(String skill) { // , String[] itemRules, String[] expRules, String[] expTable) {
 		Connection conn = null;
 		Statement st = null;
@@ -87,26 +100,32 @@ public class DatabaseManager {
 			conn = DriverManager.getConnection(skillDatabasePath(skill));
 			st = conn.createStatement();
 			
-			String itemRulesUpdate = "CREATE TABLE `itemRules` (" +
-				"`id` INTEGER PRIMARY KEY AUTO_INCREMENT," +
-				"`itemId` INTEGER," +
-				"`exp` INTEGER" + ");";
+			if (!itemRulesTableExistsForSkill(skill)) {
+				String itemRulesUpdate = "CREATE TABLE `itemRules` (" +
+					"`id` INTEGER PRIMARY KEY AUTO_INCREMENT," +
+					"`itemId` INTEGER," +
+					"`exp` INTEGER" + ");";
+				st.executeUpdate(itemRulesUpdate);
+			}
 			
-			String expRulesUpdate = "CREATE TABLE `expRules` (" +
-				"`id` INTEGER PRIMARY KEY AUTO_INCREMENT," +
-				"`action` varchar(32)," +
-				"`receiver` varchar(32)," + 
-				"`receiverState` varchar(32)," +
-				"`experience` INTEGER" + ");";
+			if (!expRulesTableExistsForSkill(skill)) {
+				String expRulesUpdate = "CREATE TABLE `expRules` (" +
+					"`id` INTEGER PRIMARY KEY AUTO_INCREMENT," +
+					"`action` varchar(32)," +
+					"`receiver` varchar(32)," + 
+					"`receiverState` varchar(32)," +
+					"`experience` INTEGER" + ");";
+				st.executeUpdate(expRulesUpdate);
+			}
 			
-			String expLevelsUpdate = "CREATE TABLE `expLevels` (" +
-				"`id` INTEGER PRIMARY KEY AUTO_INCREMENT," +
-				"`level` INTEGER," +
-				"`expNeeded` INTEGER" + ");";
+			if (!expLevelsTableExistsForSkill(skill)) {
+				String expLevelsUpdate = "CREATE TABLE `expLevels` (" +
+					"`id` INTEGER PRIMARY KEY AUTO_INCREMENT," +
+					"`level` INTEGER," +
+					"`expNeeded` INTEGER" + ");";
+				st.executeUpdate(expLevelsUpdate);
+			}			
 			
-			st.executeUpdate(itemRulesUpdate);
-			st.executeUpdate(expRulesUpdate);
-			st.executeUpdate(expLevelsUpdate);
 		} catch (SQLException e) {
 			LOG.log(Level.SEVERE, "[JLEVEL]: Create Table Exception", e);
 		} catch (ClassNotFoundException e) {
@@ -122,7 +141,6 @@ public class DatabaseManager {
 			}
 		}
 	}
-	*/
 	
 	
 	
@@ -135,7 +153,14 @@ public class DatabaseManager {
 	public static boolean itemRulesTableExistsForSkill(String skill) {
 		return tableExists(skillDatabasePath(skill), "itemRules");
 	}
-	// TODO: CONTINUE PATTERN!
+	
+	public static boolean expRulesTableExistsForSkill(String skill) {
+		return tableExists(skillDatabasePath(skill), "expRules");
+	}
+	
+	public static boolean expLevelsTableExistsForSkill(String skill) {
+		return tableExists(skillDatabasePath(skill), "expLevels");
+	}
 	
 	public static boolean tableExists(String connectionPath, String tableName) {
 		Connection conn = null;
