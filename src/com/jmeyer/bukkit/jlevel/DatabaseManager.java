@@ -51,7 +51,7 @@ public class DatabaseManager {
 			st = conn.createStatement();
 			
 			// TODO: make addRow() and addItemRulesRow(Skill, _, _);
-			String itemRulesUpdate = "INSERT INTO `itemRules` (`itemId`,`exp`) VALUES(0,1);";
+			String itemRulesUpdate = "INSERT INTO `itemRules` (`itemId`,`level`) VALUES(0,1);";
 			st.executeUpdate(itemRulesUpdate);
 
 			String expRulesUpdate = "INSERT INTO `expRules` (`action`,`receiver`,`receiverState`,`exp`) VALUES('blockbreak', '1', '0', 3);";
@@ -145,7 +145,7 @@ public class DatabaseManager {
 				String itemRulesUpdate = "CREATE TABLE `itemRules` (" +
 					"`id` INTEGER PRIMARY KEY," +
 					"`itemId` INTEGER," +
-					"`exp` INTEGER" + ");";
+					"`level` INTEGER" + ");";
 				st.executeUpdate(itemRulesUpdate);
 			}
 			
