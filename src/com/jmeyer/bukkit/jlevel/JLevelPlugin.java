@@ -50,7 +50,8 @@ public class JLevelPlugin extends JavaPlugin {
     	String[] loggingItemRules = {"0:1","271:3","275:5","286:10","258:25","279:40"};
     	String[] loggingExpRules = {"blockbreak:17:0:5","blockbreak:17:1:10","blockbreak:17:2:15"};
     	String[] loggingExpTable = {"1:83","2:91","3:102","4:112","5:124","6:138","7:151","8:168","9:185","10:204","11:226","12:249","13:274","14:304","15:335","16:369","17:408","18:450","19:497","20:548","21:606","22:667","23:737","24:814","25:898","26:990","27:1094","28:1207","29:1332","30:1470","31:1623","32:1791","33:1977","34:2182","35:2409","36:2658","37:2935","38:3240","39:3576","40:3947","41:4358","42:4810","43:5310","44:5863","45:6471","46:7144","47:7887","48:8707","49:9612"};
-    	FileManager.createNewSkillSetIfNotExists("Logging", loggingItemRules, loggingExpRules, loggingExpTable);
+    	DatabaseManager.updateSkill("Logging", loggingItemRules, loggingExpRules, loggingExpTable, false);
+    	// FileManager.createNewSkillSetIfNotExists("Logging", loggingItemRules, loggingExpRules, loggingExpTable);
     	
         // Register our events
         PluginManager pm = getServer().getPluginManager();
