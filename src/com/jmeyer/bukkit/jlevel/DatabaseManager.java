@@ -119,7 +119,7 @@ public class DatabaseManager {
 	}
 	
 	public static void createPlayerDatabaseIfNotExists(Player player) {
-		if (!playerTableExists(player)) {
+		if (!playerTableExists(player, false)) {
 			Connection conn = null;
 			Statement st = null;
 			String name = player.getName();
@@ -162,7 +162,7 @@ public class DatabaseManager {
 			conn = DriverManager.getConnection(skillDatabasePath(skill));
 			st = conn.createStatement();
 			
-			if (!itemRulesTableExistsForSkill(skill)) {
+			if (!itemRulesTableExistsForSkill(skill, false)) {
 				String itemRulesUpdate = "CREATE TABLE `itemRules` (" +
 					"`id` INTEGER PRIMARY KEY," +
 					"`itemId` INTEGER," +
@@ -170,7 +170,7 @@ public class DatabaseManager {
 				st.executeUpdate(itemRulesUpdate);
 			}
 			
-			if (!expRulesTableExistsForSkill(skill)) {
+			if (!expRulesTableExistsForSkill(skill, false)) {
 				String expRulesUpdate = "CREATE TABLE `expRules` (" +
 					"`id` INTEGER PRIMARY KEY," +
 					"`action` varchar(32)," +
@@ -180,7 +180,7 @@ public class DatabaseManager {
 				st.executeUpdate(expRulesUpdate);
 			}
 			
-			if (!expLevelsTableExistsForSkill(skill)) {
+			if (!expLevelsTableExistsForSkill(skill, false)) {
 				String expLevelsUpdate = "CREATE TABLE `expLevels` (" +
 					"`id` INTEGER PRIMARY KEY," +
 					"`level` INTEGER," +
@@ -229,7 +229,7 @@ public class DatabaseManager {
 	}
 	
 	public static int playerSkillLevel(Player player, String skill) {
-		if (playerTableExists(player)) {
+		if (playerTableExists(player, true)) {
 			Connection conn = null;
 			Statement st = null;
 			ResultSet rs = null;
@@ -283,7 +283,7 @@ public class DatabaseManager {
 	// used as new itemRelatesToSkill
 	// TODO: decide if ok solution
 	private static int requiredLevelForItem(String skill, int itemId) {
-		if (itemRulesTableExistsForSkill(skill)) {
+		if (itemRulesTableExistsForSkill(skill, true)) {
 			Connection conn = null;
 			Statement st = null;
 			ResultSet rs = null;
@@ -319,7 +319,7 @@ public class DatabaseManager {
 	}
 	
 	private static boolean itemRelatesToSkill(String skill, int itemId) {
-		if (itemRulesTableExistsForSkill(skill)) {
+		if (itemRulesTableExistsForSkill(skill, true)) {
 			Connection conn = null;
 			Statement st = null;
 			ResultSet rs = null;
@@ -364,35 +364,50 @@ public class DatabaseManager {
 	// File check methods (Tables, Directories, etc.)
 	// ======================================================
 	
-	public static boolean playerTableExists(Player player) {
-		return tableExists(playerDatabasePath(player), player.getName());
+	public static boolean playerTableExists(Player player, boolean showError) {
+		if(tableExists(playerDatabasePath(player), player.getName())) {
+			if (showError) {
+				LOG.log(Level.WARNING, "[JLEVEL]: Missing player table for " + player.getName() + ".");
+			}
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
-	public static boolean allTablesExistForSkill(String skill) {
-		return itemRulesTableExistsForSkill(skill) && expRulesTableExistsForSkill(skill) && expLevelsTableExistsForSkill(skill);
+	public static boolean allTablesExistForSkill(String skill, boolean showError) {
+		return itemRulesTableExistsForSkill(skill, showError) && 
+			expRulesTableExistsForSkill(skill, showError) && 
+			expLevelsTableExistsForSkill(skill, showError);
 	}
 	
-	public static boolean itemRulesTableExistsForSkill(String skill) {
+	public static boolean itemRulesTableExistsForSkill(String skill, boolean showError) {
 		if (tableExists(skillDatabasePath(skill), "itemRules")) {
-			LOG.log(Level.WARNING, "[JLEVEL]: Missing itemRules table for " + skill + " skill.");
+			if (showError) {
+				LOG.log(Level.WARNING, "[JLEVEL]: Missing itemRules table for " + skill + " skill.");
+			}
 			return true;
 		} else {
 			return false;
 		}
 	}
 	
-	public static boolean expRulesTableExistsForSkill(String skill) {
+	public static boolean expRulesTableExistsForSkill(String skill, boolean showError) {
 		if (tableExists(skillDatabasePath(skill), "expRules")) {
-			LOG.log(Level.WARNING, "[JLEVEL]: Missing expRules table for " + skill + " skill.");
+			if (showError) {
+				LOG.log(Level.WARNING, "[JLEVEL]: Missing expRules table for " + skill + " skill.");
+			}
 			return true;
 		} else {
 			return false;
 		}
 	}
 	
-	public static boolean expLevelsTableExistsForSkill(String skill) {
+	public static boolean expLevelsTableExistsForSkill(String skill, boolean showError) {
 		if (tableExists(skillDatabasePath(skill), "expLevels")) {
-			LOG.log(Level.WARNING, "[JLEVEL]: Missing expLevels table for " + skill + " skill.");
+			if (showError) {
+				LOG.log(Level.WARNING, "[JLEVEL]: Missing expLevels table for " + skill + " skill.");
+			}
 			return true;
 		} else {
 			return false;
