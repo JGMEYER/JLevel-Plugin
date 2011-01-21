@@ -57,7 +57,7 @@ public class JLevelPlayerListener extends PlayerListener {
             }
 
             event.setCancelled(true);
-        } else if (split[0].equalsIgnoreCase("/debug")) {
+        } else if (split[0].equalsIgnoreCase("/debugskills")) {
             plugin.setDebugging(player, !plugin.isDebugging(player));
 
             event.setCancelled(true);
