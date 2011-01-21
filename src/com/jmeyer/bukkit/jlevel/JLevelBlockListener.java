@@ -4,6 +4,7 @@ package com.jmeyer.bukkit.jlevel;
 import java.util.ArrayList;
 
 import org.bukkit.block.BlockDamageLevel;
+import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -23,7 +24,13 @@ public class JLevelBlockListener extends BlockListener {
     
     @Override
     public void onBlockDamage(BlockDamageEvent event) {
-    	int itemID = event.getPlayer().getItemInHand().getTypeId();
+    	int itemId = event.getPlayer().getItemInHand().getTypeId();
+    	Player player = event.getPlayer();
+    	if (DatabaseManager.playerCanUseItem(player, itemId)) {
+    	} else {
+    		event.setCancelled(true);
+    	}
+    	/*
     	if (FileManager.playerCanUseItem(event.getPlayer(), itemID)) {
 	    	if (event.getDamageLevel() == BlockDamageLevel.BROKEN) {
 	    		ArrayList<String> skills = FileManager.getRelatedSkillsForItem(itemID);
@@ -42,6 +49,7 @@ public class JLevelBlockListener extends BlockListener {
     	} else {
     		event.setCancelled(true);
     	}
+    	*/
     }
     
     @Override
