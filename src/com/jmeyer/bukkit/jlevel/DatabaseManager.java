@@ -95,6 +95,10 @@ public class DatabaseManager {
 	
 	
 	
+	// ======================================================
+	// Creation methods (Tables, Directories, etc.)
+	// ======================================================
+	
 	public static void createDirectoriesIfNotExists() {
 		File rootDirectory = new File("JLevel-Data");
 		File playerDirectory = new File("JLevel-Data/Players");
@@ -202,20 +206,93 @@ public class DatabaseManager {
 	
 	
 	
+	
+	// ======================================================
+	// Data check methods (Tables)
+	// ======================================================
+	
+	/*
+	public static boolean playerCanUseItem(Player player, int itemId) {
+		
+	}
+	
+	public static int playerSkillLevel(Player player, String skill) {
+		if (!playerTableExists(player)) {
+			Connection conn = null;
+			Statement st = null;
+			try {
+				Class.forName("org.sqlite.JDBC");
+				conn = DriverManager.getConnection(playerDatabasePath(player));
+				st = conn.createStatement();
+				
+				String update = "CREATE TABLE `" + player.getName() + "` (" +
+					"`id` INTEGER PRIMARY KEY," +
+					"`skillName` varchar(32)," +
+					"`skillLevel` INTEGER," +
+					"`levelExp` INTEGER," +
+					"`nextLevelExp` INTEGER," +
+					"`totalExp` INTEGER" + ");";
+				
+				st.executeUpdate(update);
+			} catch (SQLException e) {
+				LOG.log(Level.SEVERE, "[JLEVEL]: Create Table Exception", e);
+			} catch (ClassNotFoundException e) {
+				LOG.log(Level.SEVERE, "[JLEVEL]: Error loading org.sqlite.JDBC");
+			} finally {
+				try {
+					if (conn != null)
+						conn.close();
+					if (st != null)
+						st.close();
+				} catch (SQLException e) {
+					LOG.log(Level.SEVERE, "[JLEVEL]: Could not create the table (on close)");
+				}
+			}
+		}
+	}
+	*/
+	
+	
+	
+	
+	
+	// ======================================================
+	// File check methods (Tables, Directories, etc.)
+	// ======================================================
+	
 	public static boolean playerTableExists(Player player) {
 		return tableExists(playerDatabasePath(player), player.getName());
 	}
 	
+	public static boolean allTablesExistForSkill(String skill) {
+		return itemRulesTableExistsForSkill(skill) && expRulesTableExistsForSkill(skill) && expLevelsTableExistsForSkill(skill);
+	}
+	
 	public static boolean itemRulesTableExistsForSkill(String skill) {
-		return tableExists(skillDatabasePath(skill), "itemRules");
+		if (tableExists(skillDatabasePath(skill), "itemRules")) {
+			LOG.log(Level.WARNING, "[JLEVEL]: Missing itemRules table for " + skill + " skill.");
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	public static boolean expRulesTableExistsForSkill(String skill) {
-		return tableExists(skillDatabasePath(skill), "expRules");
+		if (tableExists(skillDatabasePath(skill), "expRules")) {
+			LOG.log(Level.WARNING, "[JLEVEL]: Missing expRules table for " + skill + " skill.");
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	public static boolean expLevelsTableExistsForSkill(String skill) {
-		return tableExists(skillDatabasePath(skill), "expLevels");
+		if (tableExists(skillDatabasePath(skill), "expLevels")) {
+			LOG.log(Level.WARNING, "[JLEVEL]: Missing expLevels table for " + skill + " skill.");
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	public static boolean tableExists(String connectionPath, String tableName) {
@@ -249,6 +326,11 @@ public class DatabaseManager {
 	
 	
 	
+	
+	
+	// ======================================================
+	// Private path methods
+	// ======================================================
 	
 	private static String playerDatabasePath(Player player) {
 		return PLAYER_DB_DIRECTORY + player.getName() + ".db";
