@@ -19,6 +19,8 @@ public class JLevelBlockListener extends BlockListener {
         this.plugin = plugin;
     }
 
+    // TODO: add debug text for debugging users
+    
     @Override
     public void onBlockDamage(BlockDamageEvent event) {
     	int itemID = event.getPlayer().getItemInHand().getTypeId();
