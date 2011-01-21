@@ -51,7 +51,7 @@ public class JLevelBlockListener extends BlockListener {
     	}
     	*/
     }
-    
+        
     @Override
     public void onBlockPlace(BlockPlaceEvent event) {
     	int blockID = event.getBlock().getTypeId();
@@ -60,6 +60,13 @@ public class JLevelBlockListener extends BlockListener {
     	if (blockID == 14 || blockID == 15) {
     		event.setCancelled(true);
     	}
+    	
+    	// =================================
+    	
+    	int itemId = event.getPlayer().getItemInHand().getTypeId();
+    	Player player = event.getPlayer();
+    	 	
+    	player.sendMessage("" + DatabaseManager.playerCanUseItem(player, itemId));
     }
     
 }
