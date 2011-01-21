@@ -26,6 +26,8 @@ public class JLevelBlockListener extends BlockListener {
 	    	if (event.getDamageLevel() == BlockDamageLevel.BROKEN) {
 	    		ArrayList<String> skills = FileManager.getRelatedSkillsForItem(itemID);
 	    		
+	    		System.out.println(event.getBlock().getData());
+	    		
 	    		// String message = "Item " + itemID + " relates to: "; //
 	        	for (String skill : skills) {
 	        		// message += skill + " "; //
