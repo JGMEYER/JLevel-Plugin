@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.filechooser.FileFilter;
+
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
@@ -214,10 +216,13 @@ public class DatabaseManager {
 	// ======================================================
 	
 	public static boolean playerCanUseItem(Player player, int itemId) {
-		ArrayList<String> relatedSkills = relatedSkillsForItem(itemId);
+		File root = new File(SKILL_DIRECTORY);
+        File[] skillFiles = root.listFiles();
 		boolean canUse = true;
 		
-		for (String skill : relatedSkills) {
+		for (File file : skillFiles) {
+			String fileName = file.getName();
+			String skill = fileName.substring(0, fileName.indexOf('.'));
 			int reqLevel = requiredLevelForItem(skill, itemId);
 			if (playerSkillLevel(player, skill) < reqLevel) {
 				player.sendMessage("You must be at least level " + reqLevel + " of the " + ChatColor.YELLOW + skill + ChatColor.WHITE + " skill to use this.");
@@ -242,7 +247,10 @@ public class DatabaseManager {
 				String query = "SELECT * FROM " + name + " WHERE skillName='" + skill + "' LIMIT 1;";
 				rs = st.executeQuery(query);
 				
-				return rs.getInt("skillLevel");
+				if (rs.next())
+					return rs.getInt("skillLevel");
+				else
+					return 1;			
 			} catch (SQLException e) {
 				LOG.log(Level.SEVERE, "[JLEVEL]: Table Read Exception (Player: " + name + ", Skill: " + skill + ")", e);
 				return 1;
@@ -266,6 +274,7 @@ public class DatabaseManager {
 		}
 	}
 	
+	/*
 	public static ArrayList<String> relatedSkillsForItem(int itemId) {
 		File root = new File(SKILL_DIRECTORY);
         String[] allSkills = root.list();
@@ -279,6 +288,7 @@ public class DatabaseManager {
         
 		return relatedSkills;
 	}
+	*/
 	
 	// used as new itemRelatesToSkill
 	// TODO: decide if ok solution
@@ -292,10 +302,13 @@ public class DatabaseManager {
 				conn = DriverManager.getConnection(skillDatabasePath(skill));
 				st = conn.createStatement();
 				
-				String query = "SELECT * FROM itemRules WHERE itemId=" + itemId + ";";
+				String query = "SELECT * FROM itemRules WHERE itemId=" + itemId + " LIMIT 1;";
 				rs = st.executeQuery(query);
 				
-				return rs.getInt("level");
+				if (rs.next())
+					return rs.getInt("level");
+				else
+					return -1;		
 			} catch (SQLException e) {
 				LOG.log(Level.SEVERE, "[JLEVEL]: Table Read Exception (Skill: " + skill + ")", e);
 				return -1;
@@ -318,6 +331,7 @@ public class DatabaseManager {
 		return -1;
 	}
 	
+	/*
 	private static boolean itemRelatesToSkill(String skill, int itemId) {
 		if (itemRulesTableExistsForSkill(skill, true)) {
 			Connection conn = null;
@@ -355,6 +369,7 @@ public class DatabaseManager {
 		}
 		return false;
 	}
+	*/
 	
 	
 	
@@ -366,11 +381,11 @@ public class DatabaseManager {
 	
 	public static boolean playerTableExists(Player player, boolean showError) {
 		if(tableExists(playerDatabasePath(player), player.getName())) {
+			return true;
+		} else {
 			if (showError) {
 				LOG.log(Level.WARNING, "[JLEVEL]: Missing player table for " + player.getName() + ".");
 			}
-			return true;
-		} else {
 			return false;
 		}
 	}
@@ -383,33 +398,33 @@ public class DatabaseManager {
 	
 	public static boolean itemRulesTableExistsForSkill(String skill, boolean showError) {
 		if (tableExists(skillDatabasePath(skill), "itemRules")) {
+			return true;
+		} else {
 			if (showError) {
 				LOG.log(Level.WARNING, "[JLEVEL]: Missing itemRules table for " + skill + " skill.");
 			}
-			return true;
-		} else {
 			return false;
 		}
 	}
 	
 	public static boolean expRulesTableExistsForSkill(String skill, boolean showError) {
 		if (tableExists(skillDatabasePath(skill), "expRules")) {
+			return true;
+		} else {
 			if (showError) {
 				LOG.log(Level.WARNING, "[JLEVEL]: Missing expRules table for " + skill + " skill.");
 			}
-			return true;
-		} else {
 			return false;
 		}
 	}
 	
 	public static boolean expLevelsTableExistsForSkill(String skill, boolean showError) {
 		if (tableExists(skillDatabasePath(skill), "expLevels")) {
+			return true;
+		} else {
 			if (showError) {
 				LOG.log(Level.WARNING, "[JLEVEL]: Missing expLevels table for " + skill + " skill.");
 			}
-			return true;
-		} else {
 			return false;
 		}
 	}
