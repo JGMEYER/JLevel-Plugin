@@ -7,9 +7,11 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 /**
@@ -24,16 +26,15 @@ public class DatabaseManager {
 	
 	public static final Logger LOG = Logger.getLogger("Minecraft");
 	public static final String ROOT_DIRECTORY = "JLevel-Data";
-	public static final String PLAYER_DB_DIRECTORY = "jdbc:sqlite:" + ROOT_DIRECTORY + File.separator + "Players" + File.separator;
-	public static final String SKILL_DB_DIRECTORY = "jdbc:sqlite:" + ROOT_DIRECTORY + File.separator + "Skills" + File.separator;
+	public static final String PLAYER_DIRECTORY = ROOT_DIRECTORY + File.separator + "Players" + File.separator;
+	public static final String SKILL_DIRECTORY = ROOT_DIRECTORY + File.separator + "Skills" + File.separator;
+	public static final String PLAYER_DB_DIRECTORY = "jdbc:sqlite:" + PLAYER_DIRECTORY;
+	public static final String SKILL_DB_DIRECTORY = "jdbc:sqlite:" + SKILL_DIRECTORY;
 	
-	// TODO: remove this. doesn't allow for name change.
-	/*
-	private final static String WARP_TABLE = "CREATE TABLE `warpTable` (" + "`id` INTEGER PRIMARY KEY," + "`name` varchar(32) NOT NULL DEFAULT 'warp',"
-		+ "`creator` varchar(32) NOT NULL DEFAULT 'Player'," + "`world` tinyint NOT NULL DEFAULT '0'," + "`x` DOUBLE NOT NULL DEFAULT '0',"
-		+ "`y` tinyint NOT NULL DEFAULT '0'," + "`z` DOUBLE NOT NULL DEFAULT '0'," + "`yaw` smallint NOT NULL DEFAULT '0'," + "`pitch` smallint NOT NULL DEFAULT '0'," + "`publicAll` boolean NOT NULL DEFAULT '1',"
-		+ "`permissions` varchar(150) NOT NULL DEFAULT ''," + "`welcomeMessage` varchar(100) NOT NULL DEFAULT ''" +");";
-	*/
+	// TODO: getQueryResult(databasePath, get _, where _, equals_);
+	// TODO: getQueryResult(databasePath, query); have 1 return String and others that cast afterwards
+	// TODO: runUpdate(databasePath, update);
+	
 	
 	// TODO: make ignore null fields
 	// TODO: implement clearCurrent, which removes original tables if true
@@ -76,7 +77,7 @@ public class DatabaseManager {
 			}
 
 		} catch (SQLException e) {
-			LOG.log(Level.SEVERE, "[JLEVEL]: Create Table Exception", e);
+			LOG.log(Level.SEVERE, "[JLEVEL]: Update Table Exception (Skill: " + skill + ")", e);
 		} catch (ClassNotFoundException e) {
 			LOG.log(Level.SEVERE, "[JLEVEL]: Error loading org.sqlite.JDBC");
 		} finally {
@@ -86,7 +87,7 @@ public class DatabaseManager {
 				if (st != null)
 					st.close();
 			} catch (SQLException e) {
-				LOG.log(Level.SEVERE, "[JLEVEL]: Could not create the table (on close)");
+				LOG.log(Level.SEVERE, "[JLEVEL]: Could not update the table (on close) (Skill: " + skill + ")");
 			}
 		}
 	}
@@ -121,12 +122,13 @@ public class DatabaseManager {
 		if (!playerTableExists(player)) {
 			Connection conn = null;
 			Statement st = null;
+			String name = player.getName();
 			try {
 				Class.forName("org.sqlite.JDBC");
 				conn = DriverManager.getConnection(playerDatabasePath(player));
 				st = conn.createStatement();
 				
-				String update = "CREATE TABLE `" + player.getName() + "` (" +
+				String update = "CREATE TABLE `" + name + "` (" +
 					"`id` INTEGER PRIMARY KEY," +
 					"`skillName` varchar(32)," +
 					"`skillLevel` INTEGER," +
@@ -136,7 +138,7 @@ public class DatabaseManager {
 				
 				st.executeUpdate(update);
 			} catch (SQLException e) {
-				LOG.log(Level.SEVERE, "[JLEVEL]: Create Table Exception", e);
+				LOG.log(Level.SEVERE, "[JLEVEL]: Create Table Exception (Player: " + name + ")", e);
 			} catch (ClassNotFoundException e) {
 				LOG.log(Level.SEVERE, "[JLEVEL]: Error loading org.sqlite.JDBC");
 			} finally {
@@ -146,7 +148,7 @@ public class DatabaseManager {
 					if (st != null)
 						st.close();
 				} catch (SQLException e) {
-					LOG.log(Level.SEVERE, "[JLEVEL]: Could not create the table (on close)");
+					LOG.log(Level.SEVERE, "[JLEVEL]: Could not create the table (on close) (Player: " + name + ")");
 				}
 			}
 		}
@@ -187,7 +189,7 @@ public class DatabaseManager {
 			}			
 			
 		} catch (SQLException e) {
-			LOG.log(Level.SEVERE, "[JLEVEL]: Create Table Exception", e);
+			LOG.log(Level.SEVERE, "[JLEVEL]: Create Table Exception (Skill: " + skill + ")", e);
 		} catch (ClassNotFoundException e) {
 			LOG.log(Level.SEVERE, "[JLEVEL]: Error loading org.sqlite.JDBC");
 		} finally {
@@ -197,7 +199,7 @@ public class DatabaseManager {
 				if (st != null)
 					st.close();
 			} catch (SQLException e) {
-				LOG.log(Level.SEVERE, "[JLEVEL]: Could not create the table (on close)");
+				LOG.log(Level.SEVERE, "[JLEVEL]: Could not create the table (on close) (Skill: " + skill + ")");
 			}
 		}
 	}
@@ -211,46 +213,148 @@ public class DatabaseManager {
 	// Data check methods (Tables)
 	// ======================================================
 	
-	/*
 	public static boolean playerCanUseItem(Player player, int itemId) {
+		ArrayList<String> relatedSkills = relatedSkillsForItem(itemId);
+		boolean canUse = true;
 		
+		for (String skill : relatedSkills) {
+			int reqLevel = requiredLevelForItem(skill, itemId);
+			if (playerSkillLevel(player, skill) < reqLevel) {
+				player.sendMessage("You must be at least level " + reqLevel + " of the " + ChatColor.YELLOW + skill + ChatColor.WHITE + " skill to use this.");
+        		canUse = false;
+			}
+		}
+		
+		return canUse;
 	}
 	
 	public static int playerSkillLevel(Player player, String skill) {
-		if (!playerTableExists(player)) {
+		if (playerTableExists(player)) {
 			Connection conn = null;
 			Statement st = null;
+			ResultSet rs = null;
+			String name = player.getName();
 			try {
 				Class.forName("org.sqlite.JDBC");
 				conn = DriverManager.getConnection(playerDatabasePath(player));
 				st = conn.createStatement();
 				
-				String update = "CREATE TABLE `" + player.getName() + "` (" +
-					"`id` INTEGER PRIMARY KEY," +
-					"`skillName` varchar(32)," +
-					"`skillLevel` INTEGER," +
-					"`levelExp` INTEGER," +
-					"`nextLevelExp` INTEGER," +
-					"`totalExp` INTEGER" + ");";
+				String query = "SELECT * FROM " + name + " WHERE skillName='" + skill + "' LIMIT 1;";
+				rs = st.executeQuery(query);
 				
-				st.executeUpdate(update);
+				return rs.getInt("skillLevel");
 			} catch (SQLException e) {
-				LOG.log(Level.SEVERE, "[JLEVEL]: Create Table Exception", e);
+				LOG.log(Level.SEVERE, "[JLEVEL]: Table Read Exception (Player: " + name + ", Skill: " + skill + ")", e);
+				return 1;
 			} catch (ClassNotFoundException e) {
 				LOG.log(Level.SEVERE, "[JLEVEL]: Error loading org.sqlite.JDBC");
+				return 1;
 			} finally {
 				try {
 					if (conn != null)
 						conn.close();
 					if (st != null)
 						st.close();
+					if (rs != null)
+						rs.close();
 				} catch (SQLException e) {
-					LOG.log(Level.SEVERE, "[JLEVEL]: Could not create the table (on close)");
+					LOG.log(Level.SEVERE, "[JLEVEL]: Could not read the table (on close) (Player: " + player.getName() + ", Skill: " + skill + ")");
+				}
+			}
+		} else {
+			return 1;
+		}
+	}
+	
+	public static ArrayList<String> relatedSkillsForItem(int itemId) {
+		File root = new File(SKILL_DIRECTORY);
+        String[] allSkills = root.list();
+        ArrayList<String> relatedSkills = new ArrayList<String>();
+        
+        for (String skill : allSkills) {
+        	if (itemRelatesToSkill(skill, itemId)) {
+        		relatedSkills.add(skill);
+        	}
+        }
+        
+		return relatedSkills;
+	}
+	
+	// used as new itemRelatesToSkill
+	// TODO: decide if ok solution
+	private static int requiredLevelForItem(String skill, int itemId) {
+		if (itemRulesTableExistsForSkill(skill)) {
+			Connection conn = null;
+			Statement st = null;
+			ResultSet rs = null;
+			try {
+				Class.forName("org.sqlite.JDBC");
+				conn = DriverManager.getConnection(skillDatabasePath(skill));
+				st = conn.createStatement();
+				
+				String query = "SELECT * FROM itemRules WHERE itemId=" + itemId + ";";
+				rs = st.executeQuery(query);
+				
+				return rs.getInt("level");
+			} catch (SQLException e) {
+				LOG.log(Level.SEVERE, "[JLEVEL]: Table Read Exception (Skill: " + skill + ")", e);
+				return -1;
+			} catch (ClassNotFoundException e) {
+				LOG.log(Level.SEVERE, "[JLEVEL]: Error loading org.sqlite.JDBC");
+				return -1;
+			} finally {
+				try {
+					if (conn != null)
+						conn.close();
+					if (st != null)
+						st.close();
+					if (rs != null)
+						rs.close();
+				} catch (SQLException e) {
+					LOG.log(Level.SEVERE, "[JLEVEL]: Could not read the table (on close) (Skill: " + skill + ")");
 				}
 			}
 		}
+		return -1;
 	}
-	*/
+	
+	private static boolean itemRelatesToSkill(String skill, int itemId) {
+		if (itemRulesTableExistsForSkill(skill)) {
+			Connection conn = null;
+			Statement st = null;
+			ResultSet rs = null;
+			try {
+				Class.forName("org.sqlite.JDBC");
+				conn = DriverManager.getConnection(skillDatabasePath(skill));
+				st = conn.createStatement();
+				
+				String query = "SELECT * FROM itemRules WHERE itemId=" + itemId + ";";
+				rs = st.executeQuery(query);
+				
+				if (!rs.next())
+					return false;
+				return true;
+			} catch (SQLException e) {
+				LOG.log(Level.SEVERE, "[JLEVEL]: Table Read Exception (Skill: " + skill + ")", e);
+				return false;
+			} catch (ClassNotFoundException e) {
+				LOG.log(Level.SEVERE, "[JLEVEL]: Error loading org.sqlite.JDBC");
+				return false;
+			} finally {
+				try {
+					if (conn != null)
+						conn.close();
+					if (st != null)
+						st.close();
+					if (rs != null)
+						rs.close();
+				} catch (SQLException e) {
+					LOG.log(Level.SEVERE, "[JLEVEL]: Could not read the table (on close) (Skill: " + skill + ")");
+				}
+			}
+		}
+		return false;
+	}
 	
 	
 	
