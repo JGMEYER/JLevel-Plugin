@@ -51,14 +51,23 @@ public class DatabaseManager {
 			st = conn.createStatement();
 			
 			// TODO: make addRow() and addItemRulesRow(Skill, _, _);
-			String itemRulesUpdate = "INSERT INTO `itemRules` (`itemId`,`level`) VALUES(0,1);";
-			st.executeUpdate(itemRulesUpdate);
-
-			String expRulesUpdate = "INSERT INTO `expRules` (`action`,`receiver`,`receiverState`,`exp`) VALUES('blockbreak', '1', '0', 3);";
-			st.executeUpdate(expRulesUpdate);
+			for (String itemRule : itemRules) {
+				String[] split = itemRule.split(":", 2);
+				String itemRulesUpdate = "INSERT INTO `itemRules` (`itemId`,`level`) VALUES(" + split[0] + "," + split[1] + ");";
+				st.executeUpdate(itemRulesUpdate);
+			}
+			
+			for (String expRule : expRules) {
+				String[] split = expRule.split(":", 4);
+				String expRulesUpdate = "INSERT INTO `expRules` (`action`,`receiver`,`receiverState`,`exp`) VALUES('" + split[0] + "', '" + split[1] + "', '" + split[2] + "', " + split[3] + ");";
+				st.executeUpdate(expRulesUpdate);
+			}
 		
-			String expLevelsUpdate = "INSERT INTO `expLevels` (`level`, `expNeeded`) VALUES(1, 83);";
-			st.executeUpdate(expLevelsUpdate);
+			for (String expRow : expTable) {
+				String[] split = expRow.split(":", 2);
+				String expLevelsUpdate = "INSERT INTO `expLevels` (`level`, `expNeeded`) VALUES(" + split[0] + ", " + split[1] + ");";
+				st.executeUpdate(expLevelsUpdate);
+			}
 
 		} catch (SQLException e) {
 			LOG.log(Level.SEVERE, "[JLEVEL]: Create Table Exception", e);
