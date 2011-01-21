@@ -15,7 +15,6 @@ public class JLevelEntityListener extends EntityListener {
     
     @Override
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-    	System.out.println("registered hit");
     	Entity damager = event.getDamager();	
     	
     	if (damager instanceof Player) {
@@ -26,7 +25,7 @@ public class JLevelEntityListener extends EntityListener {
         		// player.sendMessage("detected as livingentity");
         		LivingEntity le = (LivingEntity)event.getEntity();
         		
-        		if ((le.getHealth() <= 0) && (event.getDamager() instanceof Player)) {
+        		if ((le.getHealth() <= 0)) {
         			player.sendMessage("You killed entity " + le.getEntityId());
         		}
         	}
