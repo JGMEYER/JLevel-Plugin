@@ -40,6 +40,7 @@ public class JLevelPlugin extends JavaPlugin {
     	
     	DatabaseManager.createDirectoriesIfNotExists();
     	
+    	/*
     	// Create default skills if not already added
     	String[] miningItemRules = {"270:0","274:5","285:10","257:25","278:40"};
     	String[] miningExpRules = {"blockbreak:4:-1:0","blockbreak:1:-1:3","blockbreak:48:-1:0","blockbreak:16:-1:15","blockbreak:15:-1:25","blockbreak:21:-1:40","blockbreak:14:-1:35","blockbreak:73:-1:40","blockbreak:74:-1:30","blockbreak:56:-1:50","blockbreak:49:-1:30"};
@@ -52,6 +53,7 @@ public class JLevelPlugin extends JavaPlugin {
     	String[] loggingExpTable = {"1:83","2:91","3:102","4:112","5:124","6:138","7:151","8:168","9:185","10:204","11:226","12:249","13:274","14:304","15:335","16:369","17:408","18:450","19:497","20:548","21:606","22:667","23:737","24:814","25:898","26:990","27:1094","28:1207","29:1332","30:1470","31:1623","32:1791","33:1977","34:2182","35:2409","36:2658","37:2935","38:3240","39:3576","40:3947","41:4358","42:4810","43:5310","44:5863","45:6471","46:7144","47:7887","48:8707","49:9612"};
     	DatabaseManager.updateSkill("Logging", loggingItemRules, loggingExpRules, loggingExpTable, false);
     	// FileManager.createNewSkillSetIfNotExists("Logging", loggingItemRules, loggingExpRules, loggingExpTable);
+    	*/
     	
         // Register our events
         PluginManager pm = getServer().getPluginManager();
