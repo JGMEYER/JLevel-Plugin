@@ -28,7 +28,11 @@ public class JLevelBlockListener extends BlockListener {
     	Player player = event.getPlayer();
     	if (DatabaseManager.playerCanUseItem(player, itemId)) {
     		if (event.getDamageLevel() == BlockDamageLevel.BROKEN) {
-    			player.sendMessage("exp:" + DatabaseManager.getExperienceGainedFromAction("Mining", "blockbreak", "" + event.getBlock().getTypeId(), "" + event.getBlock().getData()));
+    			ArrayList<String> skills = DatabaseManager.relatedSkillsForItem(itemId);
+    			
+    			for (String skill : skills) {
+    				player.sendMessage("(skill) exp:" + DatabaseManager.getExperienceGainedFromAction(skill, "blockbreak", "" + event.getBlock().getTypeId(), "" + event.getBlock().getData()));
+    			}
     		}
     	} else {
     		event.setCancelled(true);
@@ -63,13 +67,6 @@ public class JLevelBlockListener extends BlockListener {
     	if (blockID == 14 || blockID == 15) {
     		event.setCancelled(true);
     	}
-    	
-    	// =================================
-    	
-    	int itemId = event.getPlayer().getItemInHand().getTypeId();
-    	Player player = event.getPlayer();
-    	 	
-    	player.sendMessage("" + DatabaseManager.playerCanUseItem(player, itemId));
     }
     
 }
