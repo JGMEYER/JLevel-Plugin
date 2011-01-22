@@ -378,7 +378,7 @@ public class DatabaseManager {
 		// Add skill if not yet learned
 		if (result == null) {
 			// newLines.add("skill:" + skill + ":1:0:" + getSkillExperienceNeededForLevel(skill, 1) + ":0");
-			String update = "INSERT INTO `" + name + "` (`skillName`,`skillLevel,`levelExp`,`nextLevelExp`,`totalExp`) " + 
+			String update = "INSERT INTO `" + name + "` (`skillName`,`skillLevel`,`levelExp`,`nextLevelExp`,`totalExp`) " + 
 				"VALUES('" + skill + "', 1, 0, " + skillExperienceNeededForLevel(skill, 1) + ", 0);";
 			runUpdate(dbPath, update);
         	player.sendMessage("You learned the " + ChatColor.YELLOW + skill + ChatColor.WHITE + " skill!");
