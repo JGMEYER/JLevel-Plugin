@@ -102,6 +102,7 @@ public class DatabaseManager {
 	// Creation methods (Tables, Directories, etc.)
 	// ======================================================
 	
+	
 	public static void createDirectoriesIfNotExists() {
 		File rootDirectory = new File("JLevel-Data");
 		File playerDirectory = new File("JLevel-Data/Players");
@@ -119,6 +120,7 @@ public class DatabaseManager {
 			skillDirectory.mkdir();
 		}
 	}
+	
 	
 	public static void createPlayerDatabaseIfNotExists(Player player) {
 		if (!playerTableExists(player, false)) {
@@ -155,6 +157,7 @@ public class DatabaseManager {
 			}
 		}
 	}
+	
 	
 	public static void createSkillDatabaseIfNotExists(String skill) { // , String[] itemRules, String[] expRules, String[] expTable) {
 		Connection conn = null;
@@ -215,6 +218,7 @@ public class DatabaseManager {
 	// Data check methods (Tables)
 	// ======================================================
 	
+	
 	public static boolean playerCanUseItem(Player player, int itemId) {
 		File root = new File(SKILL_DIRECTORY);
         File[] skillFiles = root.listFiles();
@@ -232,6 +236,7 @@ public class DatabaseManager {
 		
 		return canUse;
 	}
+	
 	
 	public static int playerSkillLevel(Player player, String skill) {
 		if (playerTableExists(player, true)) {
@@ -274,6 +279,7 @@ public class DatabaseManager {
 		}
 	}
 	
+	
 	public static ArrayList<String> relatedSkillsForItem(int itemId) {
 		ArrayList<String> relatedSkills = new ArrayList<String>();
 		File root = new File(SKILL_DIRECTORY);
@@ -290,6 +296,7 @@ public class DatabaseManager {
         
 		return relatedSkills;
 	}
+	
 	
 	private static int requiredLevelForItem(String skill, int itemId) {
 		if (itemRulesTableExistsForSkill(skill, true)) {
@@ -330,6 +337,7 @@ public class DatabaseManager {
 		return -1;
 	}
 	
+	
 	private static boolean itemRelatesToSkill(String skill, int itemId) {
 		if (itemRulesTableExistsForSkill(skill, true)) {
 			Connection conn = null;
@@ -368,6 +376,7 @@ public class DatabaseManager {
 		}
 		return false;
 	}
+	
 	
 	public static void addExperience(Player player, String skill, int amount) {
 		String name = player.getName();		
@@ -412,6 +421,7 @@ public class DatabaseManager {
 		runUpdate(dbPath, update);
 	}
 	
+	
 	public static int getExperienceGainedFromAction(String skill, String action, String receiver, String receiverState) {
 		String condition = null;
 		String result = null;
@@ -438,6 +448,7 @@ public class DatabaseManager {
 			return 0;
 	}
 	
+	
 	public static int skillExperienceNeededForLevel(String skill, int level) {
 		String condition = "level=" + level;
 		String result = getQueryResult(skillDatabasePath(skill), "expLevels", "expNeeded", condition);
@@ -455,6 +466,7 @@ public class DatabaseManager {
 	// ======================================================
 	// Data script methods
 	// ======================================================
+	
 	
 	// getQueryResult(databasePath, from _, get _, where _, equals_);
 	// EX Condition: "level=1"
@@ -495,6 +507,7 @@ public class DatabaseManager {
 		}
 	}
 	
+	
 	public static void runUpdate(String dbPath, String update) {
 		Connection conn = null;
 		Statement st = null;
@@ -528,6 +541,7 @@ public class DatabaseManager {
 	// File check methods (Tables, Directories, etc.)
 	// ======================================================
 	
+	
 	public static boolean playerTableExists(Player player, boolean showError) {
 		if(tableExists(playerDatabasePath(player), player.getName())) {
 			return true;
@@ -539,11 +553,13 @@ public class DatabaseManager {
 		}
 	}
 	
+	
 	public static boolean allTablesExistForSkill(String skill, boolean showError) {
 		return itemRulesTableExistsForSkill(skill, showError) && 
 			expRulesTableExistsForSkill(skill, showError) && 
 			expLevelsTableExistsForSkill(skill, showError);
 	}
+	
 	
 	public static boolean itemRulesTableExistsForSkill(String skill, boolean showError) {
 		if (tableExists(skillDatabasePath(skill), "itemRules")) {
@@ -556,6 +572,7 @@ public class DatabaseManager {
 		}
 	}
 	
+	
 	public static boolean expRulesTableExistsForSkill(String skill, boolean showError) {
 		if (tableExists(skillDatabasePath(skill), "expRules")) {
 			return true;
@@ -567,6 +584,7 @@ public class DatabaseManager {
 		}
 	}
 	
+	
 	public static boolean expLevelsTableExistsForSkill(String skill, boolean showError) {
 		if (tableExists(skillDatabasePath(skill), "expLevels")) {
 			return true;
@@ -577,6 +595,7 @@ public class DatabaseManager {
 			return false;
 		}
 	}
+	
 	
 	public static boolean tableExists(String connectionPath, String tableName) {
 		Connection conn = null;
@@ -612,12 +631,69 @@ public class DatabaseManager {
 	
 	
 	// ======================================================
+	// Text output methods
+	// ======================================================
+	
+	
+	private static ArrayList<String> getStatLinesToOutput(Player player) {
+		String name = player.getName();		
+		String dbPath = playerDatabasePath(player);
+		File root = new File(SKILL_DIRECTORY);
+        File[] skillFiles = root.listFiles();
+        ArrayList<String> statLines = new ArrayList<String>();
+        
+        for (File file : skillFiles) {
+			String fileName = file.getName();
+			String skill = fileName.substring(0, fileName.indexOf('.'));
+			String condition = "skillName='" + skill + "'";
+			
+			// TODO: make more efficient (grab string[] of row values from query)
+			int skillLevel = Integer.parseInt(getQueryResult(dbPath, name, "skillLevel", condition));
+			double levelExp = (double)(Integer.parseInt(getQueryResult(dbPath, name, "levelExp", condition)));
+			double nextLevelExp = (double)(Integer.parseInt(getQueryResult(dbPath, name, "nextLevelExp", condition)));
+			int totalExp = Integer.parseInt(getQueryResult(dbPath, name, "nextLevelExp", condition));
+			
+			String newLine = ChatColor.WHITE + "[" + ChatColor.AQUA;
+			int expLines = (int)((20*levelExp)/nextLevelExp);
+			int blankLines = 20-expLines;
+			
+			if (nextLevelExp > 0) {
+				for (int i = 0; i < expLines; i++) {
+					newLine += "||";
+				}
+				
+				for (int i = 0; i < blankLines; i++) {
+					newLine += " ";
+				}
+				
+				newLine += ChatColor.WHITE + "] " + (int)(levelExp) + "/" + (int)(nextLevelExp) + " (" + (int)((levelExp/nextLevelExp)*100) + "%) " + ChatColor.YELLOW + skill + ChatColor.WHITE + " lvl" + skillLevel;
+			} else {
+				for (int i = 0; i < 20; i++) {
+					newLine += "||";
+				}
+				
+				newLine += ChatColor.WHITE + "] " + totalExp + "/" + totalExp + " (100%) " + ChatColor.YELLOW + skill + ChatColor.RED + " (MAX)"; 
+			}
+			
+			statLines.add(newLine);
+        }
+        
+        return statLines;
+	}
+	
+	
+	
+	
+	
+	// ======================================================
 	// Private path methods
 	// ======================================================
+	
 	
 	private static String playerDatabasePath(Player player) {
 		return PLAYER_DB_DIRECTORY + player.getName() + ".db";
 	}
+	
 	
 	private static String skillDatabasePath(String skill) {
 		return SKILL_DB_DIRECTORY + skill + ".db";
