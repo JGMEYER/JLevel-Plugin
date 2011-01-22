@@ -373,7 +373,7 @@ public class DatabaseManager {
 		String name = player.getName();		
 		String dbPath = playerDatabasePath(player);
 		String condition = "skillName='" + skill + "'";
-		String result = getQueryResult(dbPath, name, skill, condition);
+		String result = getQueryResult(dbPath, name, "skillName", condition);
 		
 		// Add skill if not yet learned
 		if (result == null) {
