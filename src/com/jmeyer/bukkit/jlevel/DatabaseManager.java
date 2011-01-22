@@ -384,41 +384,43 @@ public class DatabaseManager {
 		String condition = "skillName='" + skill + "'";
 		String result = getQueryResult(dbPath, name, "skillName", condition);
 		
-		// Add skill if not yet learned
-		if (result == null) {
-			// newLines.add("skill:" + skill + ":1:0:" + getSkillExperienceNeededForLevel(skill, 1) + ":0");
-			String update = "INSERT INTO `" + name + "` (`skillName`,`skillLevel`,`levelExp`,`nextLevelExp`,`totalExp`) " + 
-				"VALUES('" + skill + "', 1, 0, " + skillExperienceNeededForLevel(skill, 1) + ", 0);";
-			runUpdate(dbPath, update);
-        	player.sendMessage("You learned the " + ChatColor.YELLOW + skill + ChatColor.WHITE + " skill!");
+		if (amount > 0) {
+			// Add skill if not yet learned
+			if (result == null) {
+				// newLines.add("skill:" + skill + ":1:0:" + getSkillExperienceNeededForLevel(skill, 1) + ":0");
+				String update = "INSERT INTO `" + name + "` (`skillName`,`skillLevel`,`levelExp`,`nextLevelExp`,`totalExp`) " + 
+					"VALUES('" + skill + "', 1, 0, " + skillExperienceNeededForLevel(skill, 1) + ", 0);";
+				runUpdate(dbPath, update);
+	        	player.sendMessage("You learned the " + ChatColor.YELLOW + skill + ChatColor.WHITE + " skill!");
+				
+				return;
+			}
 			
-			return;
+			// TODO: make more efficient (grab string[] of row values from query)
+			int skillLevel = Integer.parseInt(getQueryResult(dbPath, player.getName(), "skillLevel", condition));
+			int levelExp = Integer.parseInt(getQueryResult(dbPath, player.getName(), "levelExp", condition));
+			int nextLevelExp = Integer.parseInt(getQueryResult(dbPath, player.getName(), "nextLevelExp", condition));
+			int totalExp = Integer.parseInt(getQueryResult(dbPath, player.getName(), "nextLevelExp", condition));
+			
+			// Add exp if not max level
+			if (nextLevelExp > 0) {
+				levelExp += amount;
+				totalExp += amount;
+				player.sendMessage("+(" + amount + ") " + skill);
+			}
+			
+			// Level up if nextLevelExp reached and not max lvl
+			while (levelExp > nextLevelExp && nextLevelExp > 0) {
+				levelExp -= nextLevelExp;
+				skillLevel++;
+				nextLevelExp = skillExperienceNeededForLevel(skill, skillLevel);
+				player.sendMessage("Level up! You are now level " + skillLevel + " of the " + ChatColor.YELLOW + skill + ChatColor.WHITE + " skill.");
+			}
+			
+			String update = "UPDATE `" + name + "` SET `skillLevel`=" + skillLevel + ", `levelExp`=" + levelExp + ", `nextLevelExp`=" + 
+				nextLevelExp + ", `totalExp`=" + totalExp + " WHERE `skillName`='" + skill + "';";
+			runUpdate(dbPath, update);
 		}
-		
-		// TODO: make more efficient (grab string[] of row values from query)
-		int skillLevel = Integer.parseInt(getQueryResult(dbPath, player.getName(), "skillLevel", condition));
-		int levelExp = Integer.parseInt(getQueryResult(dbPath, player.getName(), "levelExp", condition));
-		int nextLevelExp = Integer.parseInt(getQueryResult(dbPath, player.getName(), "nextLevelExp", condition));
-		int totalExp = Integer.parseInt(getQueryResult(dbPath, player.getName(), "nextLevelExp", condition));
-		
-		// Add exp if not max level
-		if (nextLevelExp > 0) {
-			levelExp += amount;
-			totalExp += amount;
-			player.sendMessage("+(" + amount + ") " + skill);
-		}
-		
-		// Level up if nextLevelExp reached and not max lvl
-		while (levelExp > nextLevelExp && nextLevelExp > 0) {
-			levelExp -= nextLevelExp;
-			skillLevel++;
-			nextLevelExp = skillExperienceNeededForLevel(skill, skillLevel);
-			player.sendMessage("Level up! You are now level " + skillLevel + " of the " + ChatColor.YELLOW + skill + ChatColor.WHITE + " skill.");
-		}
-		
-		String update = "UPDATE `" + name + "` SET `skillLevel`=" + skillLevel + ", `levelExp`=" + levelExp + ", `nextLevelExp`=" + 
-			nextLevelExp + ", `totalExp`=" + totalExp + " WHERE `skillName`='" + skill + "';";
-		runUpdate(dbPath, update);
 	}
 	
 	
