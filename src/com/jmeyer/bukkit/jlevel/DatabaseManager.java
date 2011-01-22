@@ -275,12 +275,15 @@ public class DatabaseManager {
 	}
 	
 	public static ArrayList<String> relatedSkillsForItem(int itemId) {
+		ArrayList<String> relatedSkills = new ArrayList<String>();
 		File root = new File(SKILL_DIRECTORY);
-        String[] allSkills = root.list();
-        ArrayList<String> relatedSkills = new ArrayList<String>();
+        File[] skillFiles = root.listFiles();
         
-        for (String skill : allSkills) {
-        	if (itemRelatesToSkill(skill, itemId)) {
+        for (File file : skillFiles) {
+			String fileName = file.getName();
+			String skill = fileName.substring(0, fileName.indexOf('.'));
+			
+			if (itemRelatesToSkill(skill, itemId)) {
         		relatedSkills.add(skill);
         	}
         }
