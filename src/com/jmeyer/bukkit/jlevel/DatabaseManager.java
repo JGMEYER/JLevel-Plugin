@@ -635,8 +635,7 @@ public class DatabaseManager {
 	// ======================================================
 	
 	
-	private static ArrayList<String> getStatLinesToOutput(Player player) {
-		String name = player.getName();		
+	public static ArrayList<String> getStatLinesToOutput(String player) {	
 		String dbPath = playerDatabasePath(player);
 		File root = new File(SKILL_DIRECTORY);
         File[] skillFiles = root.listFiles();
@@ -648,10 +647,10 @@ public class DatabaseManager {
 			String condition = "skillName='" + skill + "'";
 			
 			// TODO: make more efficient (grab string[] of row values from query)
-			int skillLevel = Integer.parseInt(getQueryResult(dbPath, name, "skillLevel", condition));
-			double levelExp = (double)(Integer.parseInt(getQueryResult(dbPath, name, "levelExp", condition)));
-			double nextLevelExp = (double)(Integer.parseInt(getQueryResult(dbPath, name, "nextLevelExp", condition)));
-			int totalExp = Integer.parseInt(getQueryResult(dbPath, name, "nextLevelExp", condition));
+			int skillLevel = Integer.parseInt(getQueryResult(dbPath, player, "skillLevel", condition));
+			double levelExp = (double)(Integer.parseInt(getQueryResult(dbPath, player, "levelExp", condition)));
+			double nextLevelExp = (double)(Integer.parseInt(getQueryResult(dbPath, player, "nextLevelExp", condition)));
+			int totalExp = Integer.parseInt(getQueryResult(dbPath, player, "nextLevelExp", condition));
 			
 			String newLine = ChatColor.WHITE + "[" + ChatColor.AQUA;
 			int expLines = (int)((20*levelExp)/nextLevelExp);
@@ -692,6 +691,11 @@ public class DatabaseManager {
 	
 	private static String playerDatabasePath(Player player) {
 		return PLAYER_DB_DIRECTORY + player.getName() + ".db";
+	}
+	
+	
+	private static String playerDatabasePath(String playerName) {
+		return PLAYER_DB_DIRECTORY + playerName + ".db";
 	}
 	
 	

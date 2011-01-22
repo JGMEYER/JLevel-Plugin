@@ -62,6 +62,15 @@ public class JLevelPlayerListener extends PlayerListener {
 
             event.setCancelled(true);
         } else if (split[0].equalsIgnoreCase("/stats")) {
+        	ArrayList<String> lines = DatabaseManager.getStatLinesToOutput(player.getName());
+        	
+        	player.sendMessage(player.getName() + ":");
+        	for (String line : lines) {
+        		player.sendMessage(line);
+        	}
+        	
+        	event.setCancelled(true);
+        	/*
         	if (split.length == 2) {
         		ArrayList<String> lines = FileManager.getStatsToOutput(split[1]);
 	        	
@@ -85,6 +94,7 @@ public class JLevelPlayerListener extends PlayerListener {
 	        	
 	        	event.setCancelled(true);
         	}
+        	*/
         }
     }
 
