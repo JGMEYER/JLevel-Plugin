@@ -31,7 +31,8 @@ public class JLevelBlockListener extends BlockListener {
     			ArrayList<String> skills = DatabaseManager.relatedSkillsForItem(itemId);
     			
     			for (String skill : skills) {
-    				player.sendMessage("(skill) exp:" + DatabaseManager.getExperienceGainedFromAction(skill, "blockbreak", "" + event.getBlock().getTypeId(), "" + event.getBlock().getData()));
+    				int exp = DatabaseManager.getExperienceGainedFromAction(skill, "blockbreak", "" + event.getBlock().getTypeId(), "" + event.getBlock().getData());
+    				DatabaseManager.addExperience(player, skill, exp);
     			}
     		}
     	} else {

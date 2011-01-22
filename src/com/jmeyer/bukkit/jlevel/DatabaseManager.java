@@ -291,8 +291,6 @@ public class DatabaseManager {
 		return relatedSkills;
 	}
 	
-	// used as new itemRelatesToSkill
-	// TODO: decide if ok solution
 	private static int requiredLevelForItem(String skill, int itemId) {
 		if (itemRulesTableExistsForSkill(skill, true)) {
 			Connection conn = null;
@@ -371,6 +369,45 @@ public class DatabaseManager {
 		return false;
 	}
 	
+	public static void addExperience(Player player, String skill, int amount) {
+		String name = player.getName();		
+		String dbPath = playerDatabasePath(player);
+		String condition = "skillName='" + skill + "'";
+		String result = getQueryResult(dbPath, name, skill, condition);
+		
+		// Add skill if not yet learned
+		if (result == null) {
+			// newLines.add("skill:" + skill + ":1:0:" + getSkillExperienceNeededForLevel(skill, 1) + ":0");
+			String update = "INSERT INTO `" + name + "` (`skillName`,`skillLevel,`levelExp`,`nextLevelExp`,`totalExp`) " + 
+				"VALUES('" + skill + "', 1, 0, " + skillExperienceNeededForLevel(skill, 1) + ", 0);";
+			runUpdate(dbPath, update);
+        	player.sendMessage("You learned the " + ChatColor.YELLOW + skill + ChatColor.WHITE + " skill!");
+			
+			return;
+		}
+		
+		// TODO: make more efficient (grab string[] of row values from query)
+		int skillLevel = Integer.parseInt(getQueryResult(dbPath, player.getName(), "skillLevel", condition));
+		int levelExp = Integer.parseInt(getQueryResult(dbPath, player.getName(), "levelExp", condition));
+		int nextLevelExp = Integer.parseInt(getQueryResult(dbPath, player.getName(), "nextLevelExp", condition));
+		int totalExp = Integer.parseInt(getQueryResult(dbPath, player.getName(), "nextLevelExp", condition));
+		
+		// Add exp if not max level
+		if (nextLevelExp > 0) {
+			levelExp += amount;
+			totalExp += amount;
+			player.sendMessage("+(" + amount + ") " + skill);
+		}
+		
+		// Level up if nextLevelExp reached and not max lvl
+		while (levelExp > nextLevelExp && nextLevelExp > 0) {
+			levelExp -= nextLevelExp;
+			skillLevel++;
+			nextLevelExp = skillExperienceNeededForLevel(skill, skillLevel);
+			player.sendMessage("Level up! You are now level " + skillLevel + " of the " + ChatColor.YELLOW + skill + ChatColor.WHITE + " skill.");
+		}
+	}
+	
 	public static int getExperienceGainedFromAction(String skill, String action, String receiver, String receiverState) {
 		String condition = null;
 		String result = null;
@@ -407,6 +444,14 @@ public class DatabaseManager {
 			return -1;
 	}
 	
+	
+	
+	
+	
+	// ======================================================
+	// Data script methods
+	// ======================================================
+	
 	// getQueryResult(databasePath, from _, get _, where _, equals_);
 	// EX Condition: "level=1"
 	public static String getQueryResult(String dbPath, String tableFrom, String itemToGet, String condition) {
@@ -442,6 +487,31 @@ public class DatabaseManager {
 					rs.close();
 			} catch (SQLException e) {
 				LOG.log(Level.SEVERE, "[JLEVEL]: Could not read the table (on close) (getResult) \n" + query);
+			}
+		}
+	}
+	
+	public static void runUpdate(String dbPath, String update) {
+		Connection conn = null;
+		Statement st = null;
+		try {
+			Class.forName("org.sqlite.JDBC");
+			conn = DriverManager.getConnection(dbPath);
+			st = conn.createStatement();
+			
+			st.executeUpdate(update);
+		} catch (SQLException e) {
+			LOG.log(Level.SEVERE, "[JLEVEL]: Run Update Exception \n" + update, e);
+		} catch (ClassNotFoundException e) {
+			LOG.log(Level.SEVERE, "[JLEVEL]: Error loading org.sqlite.JDBC");
+		} finally {
+			try {
+				if (conn != null)
+					conn.close();
+				if (st != null)
+					st.close();
+			} catch (SQLException e) {
+				LOG.log(Level.SEVERE, "[JLEVEL]: Could not run update \n" + update);
 			}
 		}
 	}
