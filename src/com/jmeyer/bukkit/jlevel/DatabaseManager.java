@@ -436,7 +436,7 @@ public class DatabaseManager {
 	
 	public static int skillExperienceNeededForLevel(String skill, int level) {
 		String condition = "level=" + level;
-		String result = getQueryResult(skillDatabasePath(skill), "expLevels", "exp", condition);
+		String result = getQueryResult(skillDatabasePath(skill), "expLevels", "expNeeded", condition);
 		
 		if (result != null)
 			return Integer.parseInt(result);
