@@ -274,7 +274,6 @@ public class DatabaseManager {
 		}
 	}
 	
-	/*
 	public static ArrayList<String> relatedSkillsForItem(int itemId) {
 		File root = new File(SKILL_DIRECTORY);
         String[] allSkills = root.list();
@@ -288,7 +287,6 @@ public class DatabaseManager {
         
 		return relatedSkills;
 	}
-	*/
 	
 	// used as new itemRelatesToSkill
 	// TODO: decide if ok solution
@@ -331,7 +329,6 @@ public class DatabaseManager {
 		return -1;
 	}
 	
-	/*
 	private static boolean itemRelatesToSkill(String skill, int itemId) {
 		if (itemRulesTableExistsForSkill(skill, true)) {
 			Connection conn = null;
@@ -347,7 +344,8 @@ public class DatabaseManager {
 				
 				if (!rs.next())
 					return false;
-				return true;
+				else
+					return true;
 			} catch (SQLException e) {
 				LOG.log(Level.SEVERE, "[JLEVEL]: Table Read Exception (Skill: " + skill + ")", e);
 				return false;
@@ -369,7 +367,6 @@ public class DatabaseManager {
 		}
 		return false;
 	}
-	*/
 	
 	public static int getExperienceGainedFromAction(String skill, String action, String receiver, String receiverState) {
 		String condition = null;
@@ -379,7 +376,7 @@ public class DatabaseManager {
 			condition = "action='blockbreak' AND receiver='" + receiver + "'";
 			
 			if (Integer.parseInt(receiverState) >= 0) {
-				condition += " AND receiverState='" + receiverState + "'";
+				condition += " AND (receiverState='" + receiverState + "' OR receiverState='-1')";
 			}
 			
 			System.out.println(condition);
