@@ -376,13 +376,15 @@ public class DatabaseManager {
 		String result = null;
 		
 		if (action.equals("blockbreak")) {
-			condition = "action='blockbreak' && receiver='" + receiver + "'";
+			condition = "action='blockbreak' AND receiver='" + receiver + "'";
 			
 			if (Integer.parseInt(receiverState) >= 0) {
-				condition += " && receiverState='"+receiverState + "'";
+				condition += " AND receiverState='" + receiverState + "'";
 			}
+			
+			System.out.println(condition);
 		} else if (action.equals("monsterkill")) {
-			condition = "action='monsterkill' && receiver='" + receiver + "'";
+			condition = "action='monsterkill' AND receiver='" + receiver + "'";
 		} else {
 			return 0;
 		}
@@ -411,12 +413,13 @@ public class DatabaseManager {
 		Connection conn = null;
 		Statement st = null;
 		ResultSet rs = null;
+		String query = null;
 		try {
 			Class.forName("org.sqlite.JDBC");
 			conn = DriverManager.getConnection(dbPath);
 			st = conn.createStatement();
 			
-			String query = "SELECT * FROM " + tableFrom + " WHERE " + condition + " LIMIT 1;";
+			query = "SELECT * FROM " + tableFrom + " WHERE " + condition + " LIMIT 1;";
 			rs = st.executeQuery(query);
 			
 			if (rs.next())
@@ -424,7 +427,7 @@ public class DatabaseManager {
 			else
 				return null;		
 		} catch (SQLException e) {
-			LOG.log(Level.SEVERE, "[JLEVEL]: Table Read Exception (getResult)", e);
+			LOG.log(Level.SEVERE, "[JLEVEL]: Table Read Exception (getResult) \n" + query, e);
 			return null;
 		} catch (ClassNotFoundException e) {
 			LOG.log(Level.SEVERE, "[JLEVEL]: Error loading org.sqlite.JDBC");
@@ -438,7 +441,7 @@ public class DatabaseManager {
 				if (rs != null)
 					rs.close();
 			} catch (SQLException e) {
-				LOG.log(Level.SEVERE, "[JLEVEL]: Could not read the table (on close) (getResult)");
+				LOG.log(Level.SEVERE, "[JLEVEL]: Could not read the table (on close) (getResult) \n" + query);
 			}
 		}
 	}
