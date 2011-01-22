@@ -646,35 +646,37 @@ public class DatabaseManager {
 			String skill = fileName.substring(0, fileName.indexOf('.'));
 			String condition = "skillName='" + skill + "'";
 			
-			// TODO: make more efficient (grab string[] of row values from query)
-			int skillLevel = Integer.parseInt(getQueryResult(dbPath, player, "skillLevel", condition));
-			double levelExp = (double)(Integer.parseInt(getQueryResult(dbPath, player, "levelExp", condition)));
-			double nextLevelExp = (double)(Integer.parseInt(getQueryResult(dbPath, player, "nextLevelExp", condition)));
-			int totalExp = Integer.parseInt(getQueryResult(dbPath, player, "nextLevelExp", condition));
-			
-			String newLine = ChatColor.WHITE + "[" + ChatColor.AQUA;
-			int expLines = (int)((20*levelExp)/nextLevelExp);
-			int blankLines = 20-expLines;
-			
-			if (nextLevelExp > 0) {
-				for (int i = 0; i < expLines; i++) {
-					newLine += "||";
+			if (getQueryResult(dbPath, player, "skillName", condition) != null) {
+				// TODO: make more efficient (grab string[] of row values from query)
+				int skillLevel = Integer.parseInt(getQueryResult(dbPath, player, "skillLevel", condition));
+				double levelExp = (double)(Integer.parseInt(getQueryResult(dbPath, player, "levelExp", condition)));
+				double nextLevelExp = (double)(Integer.parseInt(getQueryResult(dbPath, player, "nextLevelExp", condition)));
+				int totalExp = Integer.parseInt(getQueryResult(dbPath, player, "nextLevelExp", condition));
+				
+				String newLine = ChatColor.WHITE + "[" + ChatColor.AQUA;
+				int expLines = (int)((20*levelExp)/nextLevelExp);
+				int blankLines = 20-expLines;
+				
+				if (nextLevelExp > 0) {
+					for (int i = 0; i < expLines; i++) {
+						newLine += "||";
+					}
+					
+					for (int i = 0; i < blankLines; i++) {
+						newLine += " ";
+					}
+					
+					newLine += ChatColor.WHITE + "] " + (int)(levelExp) + "/" + (int)(nextLevelExp) + " (" + (int)((levelExp/nextLevelExp)*100) + "%) " + ChatColor.YELLOW + skill + ChatColor.WHITE + " lvl" + skillLevel;
+				} else {
+					for (int i = 0; i < 20; i++) {
+						newLine += "||";
+					}
+					
+					newLine += ChatColor.WHITE + "] " + totalExp + "/" + totalExp + " (100%) " + ChatColor.YELLOW + skill + ChatColor.RED + " (MAX)"; 
 				}
 				
-				for (int i = 0; i < blankLines; i++) {
-					newLine += " ";
-				}
-				
-				newLine += ChatColor.WHITE + "] " + (int)(levelExp) + "/" + (int)(nextLevelExp) + " (" + (int)((levelExp/nextLevelExp)*100) + "%) " + ChatColor.YELLOW + skill + ChatColor.WHITE + " lvl" + skillLevel;
-			} else {
-				for (int i = 0; i < 20; i++) {
-					newLine += "||";
-				}
-				
-				newLine += ChatColor.WHITE + "] " + totalExp + "/" + totalExp + " (100%) " + ChatColor.YELLOW + skill + ChatColor.RED + " (MAX)"; 
+				statLines.add(newLine);
 			}
-			
-			statLines.add(newLine);
         }
         
         return statLines;
