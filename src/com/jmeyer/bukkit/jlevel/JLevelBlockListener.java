@@ -27,6 +27,9 @@ public class JLevelBlockListener extends BlockListener {
     	int itemId = event.getPlayer().getItemInHand().getTypeId();
     	Player player = event.getPlayer();
     	if (DatabaseManager.playerCanUseItem(player, itemId)) {
+    		if (event.getDamageLevel() == BlockDamageLevel.BROKEN) {
+    			player.sendMessage("exp:" + DatabaseManager.getExperienceGainedFromAction("Mining", "blockbreak", "" + event.getBlock().getTypeId(), "" + event.getBlock().getData()));
+    		}
     	} else {
     		event.setCancelled(true);
     	}
