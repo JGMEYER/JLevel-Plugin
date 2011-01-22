@@ -407,8 +407,8 @@ public class DatabaseManager {
 			player.sendMessage("Level up! You are now level " + skillLevel + " of the " + ChatColor.YELLOW + skill + ChatColor.WHITE + " skill.");
 		}
 		
-		String update = "UPDATE " + name + " SET skillLevel=" + levelExp + " AND levelExp=" + levelExp + " AND nextLevelExp=" + 
-			nextLevelExp + " AND totalExp=" + totalExp + " WHERE skillName='" + skill + "';";
+		String update = "UPDATE `" + name + "` SET `skillLevel`=" + levelExp + ", `levelExp`=" + levelExp + ", `nextLevelExp`=" + 
+			nextLevelExp + ", `totalExp`=" + totalExp + " WHERE `skillName`='" + skill + "';";
 		runUpdate(dbPath, update);
 	}
 	
