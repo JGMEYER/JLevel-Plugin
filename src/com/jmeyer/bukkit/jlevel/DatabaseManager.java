@@ -371,6 +371,78 @@ public class DatabaseManager {
 	}
 	*/
 	
+	public static int getExperienceGainedFromAction(String skill, String action, String receiver, String receiverState) {
+		String condition = null;
+		String result = null;
+		
+		if (action.equals("blockbreak")) {
+			condition = "action='blockbreak' && receiver='" + receiver + "'";
+			
+			if (Integer.parseInt(receiverState) >= 0) {
+				condition += " && receiverState='"+receiverState + "'";
+			}
+		} else if (action.equals("monsterkill")) {
+			condition = "action='monsterkill' && receiver='" + receiver + "'";
+		} else {
+			return 0;
+		}
+		
+		result = getQueryResult(skillDatabasePath(skill), "expRules", "exp", condition);
+		
+		if (result != null)
+			return Integer.parseInt(result);
+		else 
+			return 0;
+	}
+	
+	public static int skillExperienceNeededForLevel(String skill, int level) {
+		String condition = "level=" + level;
+		String result = getQueryResult(skillDatabasePath(skill), "expLevels", "exp", condition);
+		
+		if (result != null)
+			return Integer.parseInt(result);
+		else 
+			return -1;
+	}
+	
+	// getQueryResult(databasePath, from _, get _, where _, equals_);
+	// EX Condition: "level=1"
+	public static String getQueryResult(String dbPath, String tableFrom, String itemToGet, String condition) {
+		Connection conn = null;
+		Statement st = null;
+		ResultSet rs = null;
+		try {
+			Class.forName("org.sqlite.JDBC");
+			conn = DriverManager.getConnection(dbPath);
+			st = conn.createStatement();
+			
+			String query = "SELECT * FROM " + tableFrom + " WHERE " + condition + " LIMIT 1;";
+			rs = st.executeQuery(query);
+			
+			if (rs.next())
+				return rs.getString(itemToGet);
+			else
+				return null;		
+		} catch (SQLException e) {
+			LOG.log(Level.SEVERE, "[JLEVEL]: Table Read Exception (getResult)", e);
+			return null;
+		} catch (ClassNotFoundException e) {
+			LOG.log(Level.SEVERE, "[JLEVEL]: Error loading org.sqlite.JDBC");
+			return null;
+		} finally {
+			try {
+				if (conn != null)
+					conn.close();
+				if (st != null)
+					st.close();
+				if (rs != null)
+					rs.close();
+			} catch (SQLException e) {
+				LOG.log(Level.SEVERE, "[JLEVEL]: Could not read the table (on close) (getResult)");
+			}
+		}
+	}
+	
 	
 	
 	
