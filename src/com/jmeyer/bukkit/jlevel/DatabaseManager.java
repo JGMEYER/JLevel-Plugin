@@ -406,6 +406,10 @@ public class DatabaseManager {
 			nextLevelExp = skillExperienceNeededForLevel(skill, skillLevel);
 			player.sendMessage("Level up! You are now level " + skillLevel + " of the " + ChatColor.YELLOW + skill + ChatColor.WHITE + " skill.");
 		}
+		
+		String update = "UPDATE " + name + " SET skillLevel=" + levelExp + " AND levelExp=" + levelExp + " AND nextLevelExp=" + 
+			nextLevelExp + " AND totalExp=" + totalExp + " WHERE skillName='" + skill + "';";
+		runUpdate(dbPath, update);
 	}
 	
 	public static int getExperienceGainedFromAction(String skill, String action, String receiver, String receiverState) {
