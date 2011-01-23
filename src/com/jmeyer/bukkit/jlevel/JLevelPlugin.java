@@ -53,6 +53,10 @@ public class JLevelPlugin extends JavaPlugin {
     	String[] loggingExpTable = {"1:83","2:91","3:102","4:112","5:124","6:138","7:151","8:168","9:185","10:204","11:226","12:249","13:274","14:304","15:335","16:369","17:408","18:450","19:497","20:548","21:606","22:667","23:737","24:814","25:898","26:990","27:1094","28:1207","29:1332","30:1470","31:1623","32:1791","33:1977","34:2182","35:2409","36:2658","37:2935","38:3240","39:3576","40:3947","41:4358","42:4810","43:5310","44:5863","45:6471","46:7144","47:7887","48:8707","49:9612"};
     	DatabaseManager.updateSkill("Logging", loggingItemRules, loggingExpRules, loggingExpTable, false);
     	// FileManager.createNewSkillSetIfNotExists("Logging", loggingItemRules, loggingExpRules, loggingExpTable);
+    	String[] huntingItemRules = {"0:1","268:1","272:5","283:10","261:15","267:25","276:40"};
+    	String[] huntingExpRules = {"entitykill:Slime:-1:5","entitykill:Chicken:-1:10","entitykill:Cow:-1:10","entitykill:Pig:-1:10","entitykill:Sheep:-1:10","entitykill:Squid:-1:10","entitykill:Zombie:-1:25","entitykill:PigZombie:-1:30","entitykill:Skeleton:-1:35","entitykill:Spider:-1:35","entitykill:Creeper:-1:55","entitykill:Ghast:-1:150"};
+    	String[] huntingExpTable = {"1:83","2:91","3:102","4:112","5:124","6:138","7:151","8:168","9:185","10:204","11:226","12:249","13:274","14:304","15:335","16:369","17:408","18:450","19:497","20:548","21:606","22:667","23:737","24:814","25:898","26:990","27:1094","28:1207","29:1332","30:1470","31:1623","32:1791","33:1977","34:2182","35:2409","36:2658","37:2935","38:3240","39:3576","40:3947","41:4358","42:4810","43:5310","44:5863","45:6471","46:7144","47:7887","48:8707","49:9612"};
+    	DatabaseManager.updateSkill("Hunting", huntingItemRules, huntingExpRules, huntingExpTable, false);
     	*/
     	
         // Register our events
