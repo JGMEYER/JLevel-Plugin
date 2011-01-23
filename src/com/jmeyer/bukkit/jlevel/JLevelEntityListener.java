@@ -1,7 +1,11 @@
 package com.jmeyer.bukkit.jlevel;
 
+import java.util.ArrayList;
+
+import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityListener;
@@ -15,19 +19,29 @@ public class JLevelEntityListener extends EntityListener {
     
     @Override
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-    	Entity damager = event.getDamager();	
+    	Entity damager = event.getDamager();
     	
     	if (damager instanceof Player) {
     		Player player = (Player)damager;
-    		// player.sendMessage("detected as player hit");
-    		
-        	if (event.getEntity() instanceof LivingEntity) {
-        		// player.sendMessage("detected as livingentity");
-        		LivingEntity le = (LivingEntity)event.getEntity();
-        		
-        		if ((le.getHealth() <= 0)) {
-        			player.sendMessage("You killed entity " + le.getEntityId());
-        		}
+    		int itemId = player.getItemInHand().getTypeId();
+        	
+        	if (DatabaseManager.playerCanUseItem(player, itemId)) {		
+	        	if (event.getEntity() instanceof LivingEntity) {
+	        		LivingEntity le = (LivingEntity)event.getEntity();
+	        		String leClass = event.getEntity().getClass().getName();
+        			String leName = leClass.substring(leClass.indexOf(".Craft") + 6, leClass.length());
+	        		
+	        		if ((le.getHealth()-event.getDamage() < 0) && (le.getHealth() >= 0)) {
+	        			ArrayList<String> skills = DatabaseManager.relatedSkillsForItem(itemId);
+	        			
+	        			for (String skill : skills) {
+	        				int exp = DatabaseManager.getExperienceGainedFromAction(skill, "entitykill", leName, "");
+	        				DatabaseManager.addExperience(player, skill, exp);
+	        			}
+	        		}
+	        	}
+        	} else {
+        		event.setCancelled(true);
         	}
     	}
     	
