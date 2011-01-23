@@ -387,7 +387,6 @@ public class DatabaseManager {
 		if (amount > 0) {
 			// Add skill if not yet learned
 			if (result == null) {
-				// newLines.add("skill:" + skill + ":1:0:" + getSkillExperienceNeededForLevel(skill, 1) + ":0");
 				String update = "INSERT INTO `" + name + "` (`skillName`,`skillLevel`,`levelExp`,`nextLevelExp`,`totalExp`) " + 
 					"VALUES('" + skill + "', 1, 0, " + skillExperienceNeededForLevel(skill, 1) + ", 0);";
 				runUpdate(dbPath, update);
@@ -434,10 +433,8 @@ public class DatabaseManager {
 			if (Integer.parseInt(receiverState) >= 0) {
 				condition += " AND (receiverState='" + receiverState + "' OR receiverState='-1')";
 			}
-			
-			System.out.println(condition);
-		} else if (action.equals("monsterkill")) {
-			condition = "action='monsterkill' AND receiver='" + receiver + "'";
+		} else if (action.equals("entitykill")) {
+			condition = "action='entitykill' AND receiver='" + receiver + "'";
 		} else {
 			return 0;
 		}
